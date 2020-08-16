@@ -10,9 +10,13 @@ public class GetWebcamTexture : MonoBehaviour
 
     public RenderTexture destRT;
 
+    public GameObject whitePlane;
+
     public Camera colliderCamera;
 
     public System.Action OnNewTexture;
+
+    public Texture2D tempTex;
 
     public GameObject webcamView;
 
@@ -27,6 +31,8 @@ public class GetWebcamTexture : MonoBehaviour
     public bool debugUseTestTexture = false;
     public Texture debugTestTexture;
 
+    public int numWebcamFrames = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,15 +45,21 @@ public class GetWebcamTexture : MonoBehaviour
         }
         webCamTexture.deviceName = devices[selectedDevice];
         currentDeviceIndex = selectedDevice;
-        renderer.material.mainTexture = webCamTexture;
+        renderer.material.SetTexture("MainTex", webCamTexture);
         webCamTexture.Play();
+        
 
         webcamView.SetActive(false);
+        whitePlane.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (webCamTexture.didUpdateThisFrame){
+            numWebcamFrames++;
+        }
+
         if (selectedDevice != currentDeviceIndex){
             webCamTexture.deviceName = devices[selectedDevice];
             currentDeviceIndex = selectedDevice;
@@ -77,14 +89,36 @@ public class GetWebcamTexture : MonoBehaviour
                  webcamView.SetActive(true);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.F)){
+            whitePlane.SetActive(!whitePlane.activeSelf);
+        }
     }
 
     IEnumerator CaptureRoutine(RenderTexture tgt){
 
         colliders.DestroyAllColliders();
+
+        int currentWebcamFrames = numWebcamFrames;
+        whitePlane.SetActive(true);        
+        webcamView.SetActive(false);
+
+        Debug.Log("waiting for numframes to change");
+        yield return new WaitUntil(()=> numWebcamFrames != currentWebcamFrames );
+        yield return new WaitForSeconds(1.0f);
+        Debug.Log("showing webcam, capturing image with distortion");
+
+        tempTex = new Texture2D(webCamTexture.width, webCamTexture.height);
         
+        tempTex.SetPixels(webCamTexture.GetPixels());
+        tempTex.Apply();
+
+        webcamView.GetComponent<Renderer>().material.SetTexture("MainTex", tempTex);
+
+        whitePlane.SetActive(false);
         webcamView.SetActive(true);
 
+        yield return null;
         yield return null;
         yield return null;
 
@@ -105,12 +139,16 @@ public class GetWebcamTexture : MonoBehaviour
             numFrames++;
             yield return null;
         }
+
+        Debug.Log("Dispatching onNewTexture");
         if (OnNewTexture != null){
             OnNewTexture.Invoke();
         }
 
         yield return new WaitForSeconds(1.0f);
 
-        colliders.SetColliderVisualState(false);
+        webcamView.GetComponent<Renderer>().material.SetTexture("MainTex", webCamTexture);
+
+        // colliders.SetColliderVisualState(false);
     }
 }
