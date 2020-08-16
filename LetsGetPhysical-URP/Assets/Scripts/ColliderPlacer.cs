@@ -129,12 +129,12 @@ public class ColliderPlacer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C)){
+        if (Input.GetKeyDown(KeyCode.Alpha6)){
            SetColliderVisualState(!Input.GetKey(KeyCode.LeftShift));
            
         }
 
-        if (Input.GetKeyDown(KeyCode.T)){
+        if (Input.GetKeyDown(KeyCode.Alpha5)){
             showGUI = !Input.GetKey(KeyCode.LeftShift);
         }
     }

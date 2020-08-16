@@ -66,7 +66,7 @@ public class GetWebcamTexture : MonoBehaviour
         }
 
         if (webCamTexture != null){
-            if (Input.GetKeyDown(KeyCode.Space)){
+            if (Input.GetKeyDown(KeyCode.KeypadEnter)){
                 Debug.Log("Blitting texture...");
 
 
@@ -82,7 +82,9 @@ public class GetWebcamTexture : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.W)){
+        
+
+        if (Input.GetKeyDown(KeyCode.Alpha8)){
             if (Input.GetKey(KeyCode.LeftShift)){
                 webcamView.SetActive(false);
             } else {
@@ -90,7 +92,7 @@ public class GetWebcamTexture : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.F)){
+        if (Input.GetKeyDown(KeyCode.Alpha7)){
             whitePlane.SetActive(!whitePlane.activeSelf);
         }
     }
